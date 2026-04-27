@@ -1,94 +1,63 @@
-# backend/main.py
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import List, Optional
+from sqlalchemy.orm import Session
+from typing import List
 
-app = FastAPI(
-    title="SupplierHub API Gateway",
-    description="Backend API untuk manajemen stok dan pesanan UMKM",
-    version="1.0.0"
-)
+# Import komponen internal
+from .database import engine, get_db, Base
+from . import models
 
-# 1. Konfigurasi CORS
-# Mengizinkan Frontend mengakses API ini meski berjalan di port/domain berbeda
+# Membuat tabel otomatis di MySQL saat server dijalankan
+models.Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="SupplierHub API Gateway")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Ganti dengan URL frontend (misal: http://localhost:5173) saat deploy
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# 2. Model Data (Schemas)
-class Product(BaseModel):
-    id: int
-    name: str
-    price: str
-    stock: int
-    category: str
-
-class LoginRequest(BaseModel):
-    username: str
-    password: str
-
-# 3. Database Simulasi (In-Memory)
-db_products = [
-    {"id": 1, "name": "Beras Premium 5kg", "price": "Rp 65.000", "stock": 450, "category": "Sembako"},
-    {"id": 2, "name": "Minyak Goreng 2L", "price": "Rp 32.000", "stock": 120, "category": "Sembako"},
-    {"id": 3, "name": "Gula Pasir 1kg", "price": "Rp 14.500", "stock": 15, "category": "Sembako"},
-    {"id": 4, "name": "Garam Dapur 500g", "price": "Rp 5.000", "stock": 800, "category": "Bumbu"},
-    {"id": 5, "name": "Tepung Terigu 1kg", "price": "Rp 12.000", "stock": 300, "category": "Bahan Kue"},
-]
-
-# 4. Endpoints API
 @app.get("/")
 async def root():
-    return {
-        "message": "SupplierHub API Gateway is Online",
-        "docs": "/docs" # Dokumentasi Swagger otomatis
-    }
+    return {"message": "SupplierHub API is connected to MySQL via Laragon"}
 
-@app.get("/api/products", response_model=List[Product])
-async def get_products():
-    """Mengambil semua daftar produk untuk katalog"""
-    return db_products
-
-@app.post("/api/login")
-async def login(request: LoginRequest):
-    """Proses otentikasi user/admin"""
-    # Simulasi cek login
-    if request.username == "admin" and request.password == "admin123":
-        return {
-            "status": "success",
-            "user": {"name": "Admin Supplier", "role": "admin", "id": "SUP-9921"}
-        }
-    elif request.username == "user" and request.password == "user123":
-        return {
-            "status": "success",
-            "user": {"name": "Toko UMKM Maju", "role": "user", "id": "UMKM-4412"}
-        }
-    
-    raise HTTPException(status_code=401, detail="Kredensial tidak valid")
+@app.get("/api/products")
+def get_products(db: Session = Depends(get_db)):
+    """Mengambil data produk langsung dari tabel MySQL"""
+    products = db.query(models.Product).all()
+    return products
 
 @app.get("/api/stats/{role}")
-async def get_dashboard_stats(role: str):
-    """Data statistik untuk dashboard berdasarkan peran"""
+def get_stats(role: str, db: Session = Depends(get_db)):
+    """Data statistik dinamis (simulasi query agregat)"""
     if role == "admin":
+        total_stok = db.query(models.Product).with_entities(models.Product.stock).all()
+        sum_stok = sum([s[0] for s in total_stok])
         return {
-            "total_stok": 4250,
+            "total_stok": sum_stok,
             "pesanan_proses": 18,
             "margin": "Rp 1.2M"
         }
-    elif role == "user":
+    else:
         return {
             "saldo": "Rp 500.000",
             "barang_dipesan": 12,
             "status": "Menunggu Kurir"
         }
-    
-    raise HTTPException(status_code=404, detail="Role tidak ditemukan")
 
-# Cara menjalankan: 
-# 1. Install dependensi: pip install -r requirements.txt
-# 2. Jalankan server: uvicorn main:app --reload
+# Endpoint untuk seeding data awal (Opsional: Jalankan sekali lewat Swagger)
+@app.post("/api/seed")
+def seed_data(db: Session = Depends(get_db)):
+    # Cek jika sudah ada produk
+    if db.query(models.Product).count() == 0:
+        sample_products = [
+            models.Product(name="Beras Premium 5kg", price="Rp 65.000", stock=450, category="Sembako"),
+            models.Product(name="Minyak Goreng 2L", price="Rp 32.000", stock=120, category="Sembako")
+        ]
+        db.add_all(sample_products)
+        db.commit()
+        return {"message": "Database seeded successfully"}
+    return {"message": "Database already has data"}
