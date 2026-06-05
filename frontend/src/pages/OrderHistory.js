@@ -13,14 +13,17 @@ export const OrderHistoryPage = (orders = []) => {
 
       <div class="grid grid-cols-1 gap-4">
         ${orders.length > 0 ? orders.reverse().map(order => `
-          <div class="bg-white p-6 rounded-[2rem] border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4 hover:shadow-md transition-all">
-            <div class="flex items-center gap-5 w-full md:w-auto">
+          <div class="bg-white p-6 rounded-[2rem] border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4 hover:shadow-md transition-all relative">
+            <div class="absolute top-4 right-6 text-[9px] font-black uppercase text-slate-300 tracking-widest">${order.invoice_id || 'INV-OLD-DATA'}</div>
+            
+            <div class="flex items-center gap-5 w-full md:w-auto mt-4 md:mt-0">
               <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl">
                 <i class="fas fa-box"></i>
               </div>
               <div>
                 <h4 class="font-bold text-slate-900">${order.product_name}</h4>
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">${order.date}</p>
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">${new Date(order.created_at).toLocaleDateString('id-ID')}</p>
+                ${order.notes ? `<p class="text-[10px] text-slate-500 italic mt-1 max-w-xs truncate"><i class="fas fa-comment-dots"></i> ${order.notes}</p>` : ''}
               </div>
             </div>
 
@@ -33,11 +36,15 @@ export const OrderHistoryPage = (orders = []) => {
                 <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Total Bayar</p>
                 <p class="font-black text-blue-600">${formatRupiah(order.total_price)}</p>
               </div>
+              <div class="col-span-2 md:col-span-1">
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Pembayaran</p>
+                <p class="font-bold text-[11px] ${order.payment_status === 'Lunas' ? 'text-green-600' : 'text-amber-500'} uppercase">${order.payment_status || 'Menunggu'}</p>
+              </div>
             </div>
 
-            <div class="w-full md:w-auto">
+            <div class="w-full md:w-auto mt-2 md:mt-0">
               <span class="block text-center px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest 
-                ${order.status === 'Diproses' ? 'bg-amber-100 text-amber-700' :
+                ${order.status === 'Diproses' ? 'bg-blue-100 text-blue-700' :
             order.status === 'Selesai' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-400'}">
                 ${order.status}
               </span>

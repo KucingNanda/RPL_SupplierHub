@@ -2,7 +2,7 @@
  * Halaman Katalog Belanja UMKM
  * Diperbarui: Tombol sekarang memanggil fungsi handleOrder dengan ID produk yang benar.
  */
-export const UserCatalogPage = (products = []) => {
+export const UserCatalogPage = (products = [], cart = []) => {
   const formatRupiah = (number) => {
     return new Intl.NumberFormat('id-ID', {
       style: 'currency',
@@ -11,8 +11,10 @@ export const UserCatalogPage = (products = []) => {
     }).format(number);
   };
 
+  const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
   return `
-    <div class="space-y-8 animate-fade-in">
+    <div class="space-y-8 animate-fade-in relative pb-32">
       <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-[2.5rem] p-10 text-white shadow-xl shadow-blue-100 relative overflow-hidden">
         <div class="relative z-10">
           <h3 class="text-3xl font-black mb-2 uppercase tracking-tighter text-white">Katalog Grosir UMKM</h3>
@@ -26,7 +28,7 @@ export const UserCatalogPage = (products = []) => {
           <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 hover:shadow-2xl hover:shadow-blue-100/50 transition-all flex flex-col justify-between group border-b-4 border-b-slate-200 hover:border-b-blue-500">
             <div>
               <div class="flex justify-between items-start mb-6">
-                <span class="bg-blue-50 text-blue-600 text-[10px] font-black uppercase px-4 py-1.5 rounded-full tracking-widest">${product.category}</span>
+                <span class="bg-blue-50 text-blue-600 text-[10px] font-black uppercase px-4 py-1.5 rounded-full tracking-widest">${product.category || 'PRODUK'}</span>
                 <div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 group-hover:text-red-400 transition-colors cursor-pointer">
                   <i class="fas fa-heart text-sm"></i>
                 </div>
@@ -50,12 +52,11 @@ export const UserCatalogPage = (products = []) => {
               </div>
             </div>
             
-            <!-- FIXED: Memanggil window.handleOrder dengan ID produk -->
             <button 
-              onclick="window.handleOrder(${product.id})" 
+              onclick="window.addToCart(${product.id})" 
               class="w-full mt-8 bg-slate-900 text-white py-5 rounded-[1.5rem] font-bold hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-200 transition-all flex items-center justify-center gap-3 active:scale-95"
             >
-              <i class="fas fa-cart-arrow-down"></i> Pesan Sekarang
+              <i class="fas fa-cart-plus"></i> Tambah Keranjang
             </button>
           </div>
         `).join('') : `
@@ -65,6 +66,7 @@ export const UserCatalogPage = (products = []) => {
           </div>
         `}
       </div>
+
     </div>
   `;
 };

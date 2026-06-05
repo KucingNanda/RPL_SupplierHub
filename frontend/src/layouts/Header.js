@@ -2,7 +2,7 @@
  * Komponen Header
  * Menampilkan judul halaman dan profil pengguna secara dinamis.
  */
-export const Header = (title, user = { name: 'Guest', role: 'user' }) => {
+export const Header = (title, user = { name: 'Guest', role: 'user' }, cart = []) => {
   // Mendapatkan inisial dari nama (contoh: "Admin Supplier" -> "AS")
   const initials = user.name
     .split(' ')
@@ -19,6 +19,14 @@ export const Header = (title, user = { name: 'Guest', role: 'user' }) => {
       </div>
       
       <div class="flex items-center gap-6">
+        <!-- Cart Icon (Hanya untuk non-admin) -->
+        ${user.role !== 'admin' ? `
+          <button onclick="window.toggleCart()" class="relative p-2.5 text-slate-400 hover:text-blue-600 hover:bg-white hover:shadow-sm rounded-xl transition-all group">
+            <i class="fas fa-shopping-cart text-xl"></i>
+            ${cart && cart.length > 0 ? `<span class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-md animate-bounce">${cart.length}</span>` : ''}
+          </button>
+        ` : ''}
+
         <!-- Notification Bell -->
         <button class="relative p-2.5 text-slate-400 hover:text-primary-600 hover:bg-white hover:shadow-sm rounded-xl transition-all group">
           <i class="fas fa-bell text-xl"></i>

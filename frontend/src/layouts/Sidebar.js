@@ -5,9 +5,9 @@
 export const Sidebar = (activeTab = 'dashboard', role = 'user') => {
   // Daftar menu yang disesuaikan berdasarkan Role
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: 'fa-chart-line', roles: ['admin', 'user'] },
-    { id: 'catalog', label: role === 'admin' ? 'Manajemen Stok' : 'Katalog Produk', icon: 'fa-boxes', roles: ['admin', 'user'] },
-    { id: 'orders', label: role === 'admin' ? 'Pesanan Masuk' : 'Riwayat Pesanan', icon: 'fa-shopping-cart', roles: ['admin', 'user'] },
+    { id: 'dashboard', label: 'Dashboard', icon: 'fa-chart-line', roles: ['admin', 'user', 'umkm'] },
+    { id: 'catalog', label: role === 'admin' ? 'Manajemen Stok' : 'Katalog Produk', icon: 'fa-boxes', roles: ['admin', 'user', 'umkm'] },
+    { id: 'orders', label: role === 'admin' ? 'Pesanan Masuk' : 'Riwayat Pesanan', icon: 'fa-shopping-cart', roles: ['admin', 'user', 'umkm'] },
     { id: 'settings', label: 'Pengaturan', icon: 'fa-cog', roles: ['admin'] }, // Hanya untuk Admin
   ];
 

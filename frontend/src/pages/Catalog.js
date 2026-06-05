@@ -31,17 +31,20 @@ export const CatalogPage = (products = []) => {
             </div>
             
             <div class="px-2">
-              <h4 class="font-bold text-slate-900 truncate group-hover:text-primary-600 transition-colors">${p.name}</h4>
-              <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-1">${p.category}</p>
+              <div class="flex justify-between items-start mb-1">
+                <h4 class="font-bold text-slate-900 truncate group-hover:text-primary-600 transition-colors max-w-[70%]">${p.name}</h4>
+                <span class="text-[9px] font-black uppercase bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md">${p.sku || 'NO-SKU'}</span>
+              </div>
+              <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">${p.category}</p>
               
               <div class="mt-4 flex items-center justify-between">
                 <div>
-                  <p class="text-[10px] text-slate-400 font-bold uppercase">Harga</p>
+                  <p class="text-[10px] text-slate-400 font-bold uppercase">Harga B2B</p>
                   <p class="text-primary-600 font-black text-lg">${formatRupiah(p.price)}</p>
                 </div>
                 <div class="text-right">
-                  <p class="text-[10px] text-slate-400 font-bold uppercase">Stok</p>
-                  <p class="font-bold text-slate-700">${p.stock} <span class="text-[10px] text-slate-400 font-normal italic">unit</span></p>
+                  <p class="text-[10px] text-slate-400 font-bold uppercase">Stok Gudang</p>
+                  <p class="font-bold text-slate-700">${p.stock} <span class="text-[10px] text-slate-400 font-normal italic">${p.unit || 'pcs'}</span></p>
                 </div>
               </div>
 
@@ -101,27 +104,48 @@ export const CatalogPage = (products = []) => {
                   <input type="number" id="prod-price" placeholder="0" required class="w-full pl-12 pr-5 py-4 bg-slate-50 border border-transparent rounded-2xl outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm font-semibold text-slate-700">
                 </div>
               </div>
-              <div class="group">
-                <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Stok Inventaris</label>
-                <div class="relative">
-                  <i class="fas fa-boxes absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary-500 transition-colors"></i>
-                  <input type="number" id="prod-stock" placeholder="0" required class="w-full pl-12 pr-5 py-4 bg-slate-50 border border-transparent rounded-2xl outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm font-semibold text-slate-700">
+              <div class="grid grid-cols-2 gap-3">
+                <div class="group">
+                  <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Stok</label>
+                  <div class="relative">
+                    <input type="number" id="prod-stock" placeholder="0" required class="w-full pl-4 pr-3 py-4 bg-slate-50 border border-transparent rounded-2xl outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm font-semibold text-slate-700">
+                  </div>
+                </div>
+                <div class="group">
+                  <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Satuan</label>
+                  <div class="relative">
+                    <input type="text" id="prod-unit" placeholder="pcs" required class="w-full px-4 py-4 bg-slate-50 border border-transparent rounded-2xl outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm font-semibold text-slate-700 text-center">
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div>
-              <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Kategori Produk</label>
-              <div class="relative">
-                <i class="fas fa-th-large absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
-                <select id="prod-category" required class="w-full pl-12 pr-5 py-4 bg-slate-50 border border-transparent rounded-2xl outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm font-semibold text-slate-700 appearance-none cursor-pointer">
-                  <option value="Sembako">Sembako</option>
-                  <option value="Minuman">Minuman</option>
-                  <option value="Bumbu">Bumbu</option>
-                  <option value="Lainnya">Lainnya</option>
-                </select>
-                <i class="fas fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none text-xs"></i>
+            <div class="grid grid-cols-2 gap-5">
+              <div class="group">
+                <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Kategori Produk</label>
+                <div class="relative">
+                  <i class="fas fa-th-large absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                  <select id="prod-category" required class="w-full pl-12 pr-5 py-4 bg-slate-50 border border-transparent rounded-2xl outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm font-semibold text-slate-700 appearance-none cursor-pointer">
+                    <option value="Sembako">Sembako</option>
+                    <option value="Minuman">Minuman</option>
+                    <option value="Bumbu">Bumbu</option>
+                    <option value="Lainnya">Lainnya</option>
+                  </select>
+                  <i class="fas fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none text-xs"></i>
+                </div>
               </div>
+              <div class="group">
+                <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Kode SKU</label>
+                <div class="relative">
+                  <i class="fas fa-barcode absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary-500 transition-colors"></i>
+                  <input type="text" id="prod-sku" placeholder="Contoh: BRS-PRM-5KG" required class="w-full pl-12 pr-5 py-4 bg-slate-50 border border-transparent rounded-2xl outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm font-semibold text-slate-700 uppercase">
+                </div>
+              </div>
+            </div>
+
+            <div class="group">
+              <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block ml-1">Deskripsi Tambahan</label>
+              <textarea id="prod-desc" rows="2" placeholder="Detail produk..." class="w-full p-4 bg-slate-50 border border-transparent rounded-2xl outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all text-sm font-semibold text-slate-700 resize-none"></textarea>
             </div>
 
             <button type="submit" class="w-full bg-primary-600 text-white py-4.5 rounded-[1.5rem] font-bold hover:bg-primary-700 shadow-xl shadow-primary-200 transition-all flex items-center justify-center gap-3 mt-4 text-lg">
