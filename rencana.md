@@ -1,1 +1,0 @@
-1. peran distributor sebagai pemasok untuk supplierhub ini, jadi supplierhub pun menerima pemasukan barang dari distributor

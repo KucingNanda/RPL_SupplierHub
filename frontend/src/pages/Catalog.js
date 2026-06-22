@@ -49,10 +49,13 @@ export const CatalogPage = (products = []) => {
               </div>
 
               <div class="flex gap-2 mt-6 pt-4 border-t border-slate-50">
-                <button onclick="window.showEditModal(${p.id})" class="flex-1 bg-slate-50 text-slate-600 py-2.5 rounded-xl text-xs font-bold hover:bg-primary-50 hover:text-primary-600 transition-all flex items-center justify-center gap-2">
-                  <i class="fas fa-edit"></i> Edit
+                <button onclick="window.handleRequestRestock(${p.id})" class="flex-1 bg-indigo-50 text-indigo-600 py-2.5 rounded-xl text-xs font-bold hover:bg-indigo-100 transition-all flex items-center justify-center gap-2 tooltip" title="Minta restock ke Pabrik">
+                  <i class="fas fa-truck-loading"></i> Restock
                 </button>
-                <button onclick="window.handleDeleteProduct(${p.id})" class="w-11 h-11 bg-slate-50 text-slate-400 rounded-xl hover:bg-red-50 hover:text-status-danger transition-all flex items-center justify-center">
+                <button onclick="window.showEditModal(${p.id})" class="w-11 h-11 bg-slate-50 text-slate-600 rounded-xl hover:bg-primary-50 hover:text-primary-600 transition-all flex items-center justify-center tooltip" title="Edit Produk">
+                  <i class="fas fa-edit text-xs"></i>
+                </button>
+                <button onclick="window.handleDeleteProduct(${p.id})" class="w-11 h-11 bg-slate-50 text-slate-400 rounded-xl hover:bg-red-50 hover:text-status-danger transition-all flex items-center justify-center tooltip" title="Hapus Produk">
                   <i class="fas fa-trash-alt text-xs"></i>
                 </button>
               </div>

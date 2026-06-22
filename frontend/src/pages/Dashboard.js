@@ -83,7 +83,7 @@ export const DashboardPage = (user, stats = null) => {
         </h4>
         <div class="space-y-4">
           <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-            <p class="text-sm text-slate-600">Berhasil terhubung ke database <strong>supplierhub</strong> via Laragon.</p>
+            <p class="text-sm text-slate-600">Berhasil terhubung ke database <strong>supplierhub</strong> via alwaysdata.</p>
             <span class="text-[10px] font-bold text-slate-400 uppercase">Aktif</span>
           </div>
         </div>

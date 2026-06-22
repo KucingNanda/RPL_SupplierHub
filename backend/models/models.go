@@ -35,7 +35,20 @@ type Order struct {
 	Quantity      int       `json:"quantity"`
 	TotalPrice    int       `json:"total_price"`
 	Status        string    `json:"status" gorm:"type:varchar(50)"`
-	PaymentStatus string    `json:"payment_status" gorm:"type:varchar(50);default:'Menunggu Pembayaran'"`
-	Notes         string    `json:"notes" gorm:"type:text"`
+	PaymentStatus  string     `json:"payment_status" gorm:"type:varchar(50);default:'Menunggu Pembayaran'"`
+	TrackingNumber string     `json:"tracking_number" gorm:"type:varchar(50)"`
+	ShippedAt      *time.Time `json:"shipped_at"`
+	Notes          string     `json:"notes" gorm:"type:text"`
+	CreatedAt      time.Time  `json:"created_at" gorm:"autoCreateTime"`
+}
+
+type RestockOrder struct {
+	ID            int32     `json:"id" gorm:"primaryKey"`
+	InvoiceID     string    `json:"invoice_id" gorm:"type:varchar(50)"`
+	DistributorID int32     `json:"distributor_id"`
+	AdminID       int32     `json:"admin_id"`
+	ProductID     int32     `json:"product_id"`
+	Quantity      int       `json:"quantity"`
+	Status        string    `json:"status" gorm:"type:varchar(50);default:'Menunggu Persetujuan'"`
 	CreatedAt     time.Time `json:"created_at" gorm:"autoCreateTime"`
 }

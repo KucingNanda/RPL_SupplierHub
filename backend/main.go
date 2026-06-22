@@ -232,13 +232,19 @@ func main() {
 			dateStr := o.CreatedAt.Format("02 Jan 2006, 15:04")
 
 			result = append(result, fiber.Map{
-				"id":            o.ID,
-				"customer_name": user.Name,
-				"product_name":  o.ProductName,
-				"quantity":      o.Quantity,
-				"total_price":   o.TotalPrice,
-				"status":        o.Status,
-				"date":          dateStr,
+				"id":             o.ID,
+				"customer_name":  user.Name,
+				"product_name":   o.ProductName,
+				"quantity":       o.Quantity,
+				"total_price":    o.TotalPrice,
+				"status":         o.Status,
+				"date":           dateStr,
+				"invoice_id":     o.InvoiceID,
+				"payment_status": o.PaymentStatus,
+				"tracking_number":o.TrackingNumber,
+				"shipped_at":     o.ShippedAt,
+				"notes":          o.Notes,
+				"created_at":     o.CreatedAt,
 			})
 		}
 
@@ -249,7 +255,8 @@ func main() {
 	})
 
 	type OrderStatusUpdate struct {
-		Status string `json:"status"`
+		Status        string `json:"status"`
+		PaymentStatus string `json:"payment_status"`
 	}
 
 	api.Put("/orders/:order_id/status", middleware.Protected(), func(c *fiber.Ctx) error {
@@ -270,9 +277,168 @@ func main() {
 			return c.Status(404).JSON(fiber.Map{"detail": "Order not found"})
 		}
 
-		order.Status = req.Status
+		if req.Status != "" {
+			order.Status = req.Status
+			// Jika Admin menekan Kirim (Selesai), generate resi & waktu
+			if req.Status == "Selesai" && order.TrackingNumber == "" {
+				order.TrackingNumber = fmt.Sprintf("SH-TRK-%d", time.Now().Unix())
+				now := time.Now()
+				order.ShippedAt = &now
+			}
+		}
+		if req.PaymentStatus != "" {
+			order.PaymentStatus = req.PaymentStatus
+		}
+		
 		database.DB.Save(&order)
 		return c.JSON(fiber.Map{"message": "Updated"})
+	})
+
+	api.Put("/orders/:order_id/pay", middleware.Protected(), func(c *fiber.Ctx) error {
+		// Endpoint untuk UMKM melakukan pelunasan (Simulasi Payment Gateway)
+		jwtRole := c.Locals("role").(string)
+		if jwtRole != "umkm" {
+			return c.Status(403).JSON(fiber.Map{"detail": "Hanya pembeli yang dapat membayar"})
+		}
+		
+		orderID := c.Params("order_id")
+		var order models.Order
+		if err := database.DB.First(&order, orderID).Error; err != nil {
+			return c.Status(404).JSON(fiber.Map{"detail": "Order not found"})
+		}
+
+		jwtUserID := int32(c.Locals("user_id").(float64))
+		if order.UserID != jwtUserID {
+			return c.Status(403).JSON(fiber.Map{"detail": "Bukan pesanan Anda"})
+		}
+
+		order.PaymentStatus = "Lunas"
+		database.DB.Save(&order)
+
+		return c.JSON(fiber.Map{"message": "Pembayaran Berhasil"})
+	})
+
+	// =========================
+	// RESTOCKS
+	// =========================
+	type RestockRequest struct {
+		ProductID int32 `json:"product_id"`
+		Quantity  int   `json:"quantity"`
+	}
+
+	api.Post("/restocks", middleware.Protected(), func(c *fiber.Ctx) error {
+		jwtRole := c.Locals("role").(string)
+		if jwtRole != "admin" {
+			return c.Status(403).JSON(fiber.Map{"detail": "Hanya admin yang dapat meminta restock"})
+		}
+		jwtUserID := int32(c.Locals("user_id").(float64))
+
+		var req RestockRequest
+		if err := c.BodyParser(&req); err != nil {
+			return c.Status(400).JSON(fiber.Map{"detail": "Invalid request"})
+		}
+
+		// Temukan distributor pertama (dummy logic)
+		var dist models.User
+		if err := database.DB.Where("role = ?", "distributor").First(&dist).Error; err != nil {
+			return c.Status(500).JSON(fiber.Map{"detail": "Distributor belum tersedia"})
+		}
+
+		invoiceID := fmt.Sprintf("REQ-%d", time.Now().Unix())
+		
+		restock := models.RestockOrder{
+			InvoiceID:     invoiceID,
+			AdminID:       jwtUserID,
+			DistributorID: dist.ID,
+			ProductID:     req.ProductID,
+			Quantity:      req.Quantity,
+			Status:        "Menunggu Persetujuan",
+		}
+
+		database.DB.Create(&restock)
+		return c.JSON(fiber.Map{"message": "Permintaan restock berhasil dikirim"})
+	})
+
+	api.Get("/restocks", middleware.Protected(), func(c *fiber.Ctx) error {
+		jwtRole := c.Locals("role").(string)
+		jwtUserID := int32(c.Locals("user_id").(float64))
+
+		var restocks []models.RestockOrder
+		query := database.DB.Model(&models.RestockOrder{})
+
+		if jwtRole == "distributor" {
+			query = query.Where("distributor_id = ?", jwtUserID)
+		} else if jwtRole == "admin" {
+			query = query.Where("admin_id = ?", jwtUserID)
+		} else {
+			return c.Status(403).JSON(fiber.Map{"detail": "Akses dilarang"})
+		}
+		query.Find(&restocks)
+
+		var result []fiber.Map
+		for _, r := range restocks {
+			var product models.Product
+			database.DB.First(&product, r.ProductID)
+			
+			var admin models.User
+			database.DB.First(&admin, r.AdminID)
+
+			result = append(result, fiber.Map{
+				"id":             r.ID,
+				"invoice_id":     r.InvoiceID,
+				"admin_name":     admin.Name,
+				"product_name":   product.Name,
+				"quantity":       r.Quantity,
+				"status":         r.Status,
+				"created_at":     r.CreatedAt.Format("02 Jan 2006"),
+			})
+		}
+		if result == nil {
+			result = make([]fiber.Map, 0)
+		}
+		return c.JSON(result)
+	})
+
+	api.Put("/restocks/:id/approve", middleware.Protected(), func(c *fiber.Ctx) error {
+		jwtRole := c.Locals("role").(string)
+		if jwtRole != "distributor" {
+			return c.Status(403).JSON(fiber.Map{"detail": "Hanya distributor yang dapat menyetujui"})
+		}
+
+		id := c.Params("id")
+		var restock models.RestockOrder
+		if err := database.DB.First(&restock, id).Error; err != nil {
+			return c.Status(404).JSON(fiber.Map{"detail": "Permintaan tidak ditemukan"})
+		}
+
+		if restock.Status == "Disetujui & Dikirim" {
+			return c.Status(400).JSON(fiber.Map{"detail": "Sudah disetujui sebelumnya"})
+		}
+
+		tx := database.DB.Begin()
+
+		// Set status
+		restock.Status = "Disetujui & Dikirim"
+		if err := tx.Save(&restock).Error; err != nil {
+			tx.Rollback()
+			return c.Status(500).JSON(fiber.Map{"detail": "Gagal update status"})
+		}
+
+		// Update stok produk
+		var product models.Product
+		if err := tx.First(&product, restock.ProductID).Error; err != nil {
+			tx.Rollback()
+			return c.Status(404).JSON(fiber.Map{"detail": "Produk tidak ditemukan"})
+		}
+
+		product.Stock += restock.Quantity
+		if err := tx.Save(&product).Error; err != nil {
+			tx.Rollback()
+			return c.Status(500).JSON(fiber.Map{"detail": "Gagal update stok"})
+		}
+
+		tx.Commit()
+		return c.JSON(fiber.Map{"message": "Berhasil menyetujui restock, stok bertambah"})
 	})
 
 	// =========================

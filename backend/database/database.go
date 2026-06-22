@@ -39,7 +39,7 @@ func ConnectDB() {
 
 	DB = db
 
-	err = DB.AutoMigrate(&models.User{}, &models.Product{}, &models.Order{})
+	err = DB.AutoMigrate(&models.User{}, &models.Product{}, &models.Order{}, &models.RestockOrder{})
 	if err != nil {
 		log.Fatal("Gagal migrasi database: ", err)
 	}
@@ -53,8 +53,11 @@ func ConnectDB() {
 		// Seed Users
 		admin := models.User{Name: "Admin Pusat", Username: "admin", Password: "admin123", Role: "admin", Phone: "081122334455", Address: "Gudang Pusat SupplierHub", City: "Jakarta"}
 		umkm1 := models.User{Name: "Toko Sinar Jaya", Username: "umkm1", Password: "user123", Role: "umkm", Phone: "089988776655", Address: "Jl. Merdeka No. 45", City: "Bandung"}
+		distributor := models.User{Name: "Pabrik Utama Indofood", Username: "distributor", Password: "distributor123", Role: "distributor", Phone: "0219988776", Address: "Kawasan Industri", City: "Cikarang"}
+		
 		DB.Create(&admin)
 		DB.Create(&umkm1)
+		DB.Create(&distributor)
 
 		// Seed Products
 		products := []models.Product{
