@@ -39,7 +39,7 @@ func ConnectDB() {
 
 	DB = db
 
-	err = DB.AutoMigrate(&models.User{}, &models.Product{}, &models.Order{}, &models.RestockOrder{})
+	err = DB.AutoMigrate(&models.User{}, &models.Product{}, &models.Order{}, &models.RestockOrder{}, &models.Inventory{})
 	if err != nil {
 		log.Fatal("Gagal migrasi database: ", err)
 	}
@@ -59,17 +59,23 @@ func ConnectDB() {
 		DB.Create(&umkm1)
 		DB.Create(&distributor)
 
-		// Seed Products
+		// Seed Products (Stock awal Etalase = 0)
 		products := []models.Product{
-			{Name: "Beras Premium 5kg", Category: "Sembako", SKU: "BRS-PRM-5KG", Description: "Beras pulen kualitas super.", Unit: "sak", Price: 65000, Stock: 100},
-			{Name: "Minyak Goreng 2L", Category: "Sembako", SKU: "MYK-GRG-2L", Description: "Minyak goreng bening sawit murni.", Unit: "pouch", Price: 32000, Stock: 50},
-			{Name: "Gula Pasir 1kg", Category: "Sembako", SKU: "GLA-PSR-1KG", Description: "Gula kristal putih.", Unit: "pcs", Price: 15000, Stock: 200},
-			{Name: "Telur Ayam 1kg", Category: "Sembako", SKU: "TLR-AYM-1KG", Description: "Telur ayam ras segar isi 16 butir.", Unit: "kg", Price: 28000, Stock: 30},
+			{Name: "Beras Premium 5Kg", Category: "Sembako", SKU: "BRS-PRM-001", Description: "Beras pulen kualitas super", Unit: "sak", Price: 65000, Stock: 0},
+			{Name: "Minyak Goreng 2L", Category: "Sembako", SKU: "MNY-GRG-002", Description: "Minyak sawit murni 2 Liter", Unit: "pouch", Price: 35000, Stock: 0},
+			{Name: "Gula Pasir 1Kg", Category: "Sembako", SKU: "GLA-PSR-003", Description: "Gula pasir putih lokal", Unit: "kg", Price: 15000, Stock: 0},
+			{Name: "Tepung Terigu 1Kg", Category: "Sembako", SKU: "TPG-TRG-004", Description: "Tepung protein sedang", Unit: "kg", Price: 12000, Stock: 0},
 		}
 		for _, p := range products {
 			DB.Create(&p)
 		}
-		log.Println("Auto-seeder berhasil.")
+
+		// Modal Awal: Pabrik / Distributor punya 1000 pcs per produk di Gudangnya
+		for i := 1; i <= 4; i++ {
+			DB.Create(&models.Inventory{UserID: uint(distributor.ID), ProductID: uint(i), Quantity: 1000})
+		}
+
+		log.Println("Seeder selesai. (Produk di katalog = 0, Gudang Distributor = 1000pcs)")
 	}
 
 	log.Println("Koneksi Database MySQL (Online) & Migrasi Berhasil")

@@ -28,18 +28,29 @@ type Product struct {
 }
 
 type Order struct {
-	ID            int32     `json:"id" gorm:"primaryKey"`
-	InvoiceID     string    `json:"invoice_id" gorm:"type:varchar(50)"`
-	UserID        int32     `json:"user_id"`
-	ProductName   string    `json:"product_name" gorm:"type:varchar(255)"`
-	Quantity      int       `json:"quantity"`
-	TotalPrice    int       `json:"total_price"`
-	Status        string    `json:"status" gorm:"type:varchar(50)"`
-	PaymentStatus  string     `json:"payment_status" gorm:"type:varchar(50);default:'Menunggu Pembayaran'"`
-	TrackingNumber string     `json:"tracking_number" gorm:"type:varchar(50)"`
-	ShippedAt      *time.Time `json:"shipped_at"`
-	Notes          string     `json:"notes" gorm:"type:text"`
-	CreatedAt      time.Time  `json:"created_at" gorm:"autoCreateTime"`
+	ID            int32      `json:"id" gorm:"primaryKey"`
+	InvoiceID     string     `json:"invoice_id" gorm:"type:varchar(50)"`
+	UserID        int32      `json:"user_id"`
+	ProductID     int32      `json:"product_id"`
+	ProductName   string     `json:"product_name" gorm:"type:varchar(255)"`
+	Quantity      int        `json:"quantity"`
+	TotalPrice    int        `json:"total_price"`
+	Status        string     `json:"status" gorm:"type:varchar(50)"`
+	PaymentStatus string     `json:"payment_status" gorm:"type:varchar(50);default:'Menunggu Pembayaran'"`
+	TrackingNumber string    `json:"tracking_number" gorm:"type:varchar(50)"`
+	ShippedAt     *time.Time `json:"shipped_at"`
+	Notes         string     `json:"notes" gorm:"type:text"`
+	CreatedAt     time.Time  `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt     time.Time  `json:"updated_at" gorm:"autoUpdateTime"`
+}
+
+type Inventory struct {
+	ID        uint      `json:"id" gorm:"primaryKey"`
+	UserID    uint      `json:"user_id"`
+	ProductID uint      `json:"product_id"`
+	Quantity  int       `json:"quantity"`
+	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 }
 
 type RestockOrder struct {
