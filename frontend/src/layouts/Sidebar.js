@@ -17,7 +17,7 @@ export const Sidebar = (activeTab = 'dashboard', role = 'user') => {
   const filteredMenu = menuItems.filter(item => item.roles.includes(role));
 
   return `
-    <aside class="fixed left-0 top-0 h-full w-64 bg-slate-900 text-white p-6 z-20 flex flex-col shadow-2xl">
+    <aside class="w-64 h-full bg-slate-900 text-white p-6 z-20 flex flex-col shadow-2xl shrink-0">
       <!-- Logo Section -->
       <div class="flex items-center gap-3 mb-10 px-2">
         <div class="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-900/20">

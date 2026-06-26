@@ -1,5 +1,5 @@
 import { Sidebar } from './layouts/Sidebar.js'
-import { Navbar } from './layouts/Navbar.js'
+import { Header } from './layouts/Header.js'
 import { DashboardPage } from './pages/Dashboard.js'
 import { CatalogPage } from './pages/Catalog.js'
 import { UserCatalogPage } from './pages/UserCatalog.js'
@@ -50,7 +50,7 @@ const renderApp = () => {
     <div class="flex h-screen bg-slate-50 overflow-hidden font-sans">
       ${Sidebar(state.activeTab, state.user.role)}
       <div class="flex-1 flex flex-col h-screen overflow-hidden relative">
-        ${Navbar(state.user)}
+        ${Header(state.user)}
         <main class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
           <div class="max-w-7xl mx-auto pb-20">
             ${content}

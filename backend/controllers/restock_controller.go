@@ -54,11 +54,12 @@ func GetRestocks(c *fiber.Ctx) error {
 	var restocks []models.RestockOrder
 	query := database.DB.Model(&models.RestockOrder{})
 
-	if jwtRole == "distributor" {
+	switch jwtRole {
+	case "distributor":
 		query = query.Where("distributor_id = ?", jwtUserID)
-	} else if jwtRole == "admin" {
+	case "admin":
 		query = query.Where("admin_id = ?", jwtUserID)
-	} else {
+	default:
 		return c.Status(403).JSON(fiber.Map{"detail": "Akses dilarang"})
 	}
 	query.Find(&restocks)

@@ -26,7 +26,8 @@ func GetStats(c *fiber.Ctx) error {
 
 	database.DB.Model(&models.Product{}).Count(&totalProducts)
 
-	if jwtRole == "admin" {
+	switch jwtRole {
+	case "admin":
 		database.DB.Model(&models.Order{}).Count(&totalOrders)
 		var orders []models.Order
 		database.DB.Find(&orders)
@@ -43,7 +44,7 @@ func GetStats(c *fiber.Ctx) error {
 			"total_revenue":    totalRevenue,
 			"pending_restocks": pendingRestocks,
 		})
-	} else if jwtRole == "umkm" {
+	case "umkm":
 		database.DB.Model(&models.Order{}).Where("user_id = ?", jwtUserID).Count(&totalOrders)
 		var orders []models.Order
 		database.DB.Where("user_id = ?", jwtUserID).Find(&orders)
@@ -56,7 +57,7 @@ func GetStats(c *fiber.Ctx) error {
 			"total_orders":  totalOrders,
 			"total_belanja": totalBelanja,
 		})
-	} else if jwtRole == "distributor" {
+	case "distributor":
 		database.DB.Model(&models.RestockOrder{}).Where("distributor_id = ?", jwtUserID).Count(&totalOrders)
 		database.DB.Model(&models.RestockOrder{}).Where("distributor_id = ? AND status = ?", jwtUserID, "Menunggu Persetujuan").Count(&pendingRestocks)
 		
