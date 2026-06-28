@@ -1,59 +1,52 @@
-/* Mengaktifkan fungsi Tailwind CSS v3 */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-/* Reset dasar untuk memastikan elemen root memenuhi layar */
-:root {
-width: 100%;
-min-height: 100%;
-margin: 0;
-padding: 0;
+  :root {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    @apply bg-slate-900 text-slate-200 antialiased font-sans;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  #app {
+    width: 100%;
+    min-height: 100vh;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
 }
 
-body {
-/* antialiased agar font Inter terlihat lebih tajam dan bersih */
-@apply antialiased font-sans bg-slate-50 text-slate-900;
-margin: 0;
-padding: 0;
-width: 100%;
-overflow-x: hidden;
-}
-
-/* CRITICAL: Pastikan ID app tidak membatasi lebar layout */
-#app {
-width: 100%;
-min-height: 100vh;
-max-width: none !important;
-margin: 0 !important;
-padding: 0 !important;
-}
-}
-
-/* Custom Scrollbar agar sesuai tema Slate */
+/* Custom Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #f8fafc; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #64748b; }
 
-/* Animasi Fade In untuk perpindahan halaman */
-@keyframes fadeIn {
-from { opacity: 0; transform: translateY(4px); }
-to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fade-in {
-animation: fadeIn 0.3s ease-out forwards;
-}
-
-/* Sembunyikan panah naik/turun (spinner) pada input bertipe number */
+/* Custom Inputs */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-
 input[type="number"] {
-  -moz-appearance: textfield; /* Firefox */
+  -moz-appearance: textfield;
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+  @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-xl;
+}
+.glass-card {
+  @apply bg-white/5 backdrop-blur-lg border border-white/10 hover:border-indigo-500/30 transition-all rounded-[2rem];
 }

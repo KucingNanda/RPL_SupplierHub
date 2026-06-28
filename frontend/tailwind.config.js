@@ -7,22 +7,32 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Mendefinisikan warna sesuai Laporan Palette PasarKita
         primary: {
           50: '#eff6ff',
           100: '#dbeafe',
-          600: '#2563eb',
-          700: '#1d4ed8',
+          600: '#4f46e5', // indigo-600
+          700: '#4338ca', // indigo-700
+          900: '#312e81', // indigo-900
         },
-        status: {
-          success: '#15803d', // Green-700
-          warning: '#b45309', // Amber-700
-          danger: '#b91c1c',  // Red-700
-        }
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
       },
+      animation: {
+        'fade-in': 'fadeIn 0.4s ease-out forwards',
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'wiggle': 'wiggle 1s ease-in-out infinite',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        wiggle: {
+          '0%, 100%': { transform: 'rotate(-3deg)' },
+          '50%': { transform: 'rotate(3deg)' },
+        }
+      }
     },
   },
   plugins: [],
