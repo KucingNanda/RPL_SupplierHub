@@ -8,7 +8,7 @@ export const LandingPage = () => {
            </div>
            <span class="font-bold text-xl tracking-tight">SupplierHub</span>
         </div>
-        <button onclick="navigateTo('login')" class="bg-primary-600 text-white px-6 py-2 rounded-full font-bold hover:bg-primary-700 transition-all">
+        <button onclick="switchTab('login')" class="bg-primary-600 text-white px-6 py-2 rounded-full font-bold hover:bg-primary-700 transition-all">
           Masuk Sekarang
         </button>
       </nav>

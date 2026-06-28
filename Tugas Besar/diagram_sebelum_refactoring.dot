@@ -1,0 +1,29 @@
+digraph ClassDiagramBefore {
+    rankdir=LR;
+    node [shape=record, fontname="Arial"];
+    
+    // Controllers
+    OrderController [label="{OrderController|+ CreateOrder()\n+ GetOrders()}"];
+    RestockController [label="{RestockController|+ ApproveRestock()}"];
+    StatsController [label="{StatsController|+ GetStats()}"];
+    InventoryController [label="{InventoryController|+ TransferInventory()}"];
+
+    // Database & Models
+    Database [label="{Database (GORM)|+ Begin()\n+ Save()\n+ Create()}"];
+    OrderModel [label="{Order (Model)|+ ID\n+ TotalPrice\n+ Status}"];
+    InventoryModel [label="{Inventory (Model)|+ ProductID\n+ Quantity}"];
+
+    // High Coupling Relations (Controllers directly accessing DB and multiple models)
+    OrderController -> Database [color="red", label="Direct Query & Tx"];
+    OrderController -> OrderModel;
+    OrderController -> InventoryModel [color="red", label="Cross-domain update"];
+
+    RestockController -> Database [color="red"];
+    RestockController -> InventoryModel;
+
+    StatsController -> Database [color="red", label="Aggregate Query"];
+    StatsController -> OrderModel [color="red", label="Memory Looping"];
+
+    InventoryController -> Database [color="red"];
+    InventoryController -> InventoryModel;
+}

@@ -30,7 +30,7 @@ export const Sidebar = (activeTab = 'dashboard', role = 'user') => {
       <nav class="flex-1 space-y-1">
         ${filteredMenu.map(item => `
           <button 
-            onclick="navigateTo('${item.id}')"
+            onclick="switchTab('${item.id}')"
             class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${activeTab === item.id ? 'bg-primary-600 text-white shadow-md shadow-primary-900/20' : 'text-slate-400 hover:text-white hover:bg-slate-800'}"
           >
             <i class="fas ${item.icon} w-5 text-lg ${activeTab === item.id ? 'text-white' : 'group-hover:text-primary-400'}"></i>

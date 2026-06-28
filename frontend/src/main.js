@@ -1,3 +1,4 @@
+import './style.css'
 import { Sidebar } from './layouts/Sidebar.js'
 import { Header } from './layouts/Header.js'
 import { DashboardPage } from './pages/Dashboard.js'

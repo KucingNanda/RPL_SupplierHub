@@ -1,0 +1,38 @@
+digraph ClassDiagramAfter {
+    rankdir=TB;
+    node [shape=record, fontname="Arial"];
+    
+    // Controllers (Presentation Layer)
+    OrderController [label="{OrderController|+ CreateOrder()\n+ GetOrders()}"];
+    RestockController [label="{RestockController|+ ApproveRestock()}"];
+    StatsController [label="{StatsController|+ GetStats()}"];
+    InventoryController [label="{InventoryController|+ TransferInventory()}"];
+
+    // Services (Business Logic Layer)
+    OrderService [label="{OrderService|+ CheckoutCart()}"];
+    InventoryService [label="{InventoryService|+ TransferStock()\n+ TransferToCatalog()}"];
+    StatsService [label="{StatsService|+ GetAdminDashboard()}"];
+
+    // Repositories (Data Access Layer)
+    OrderRepository [label="{OrderRepository|+ SaveOrder()\n+ FindAll()}"];
+    InventoryRepository [label="{InventoryRepository|+ UpdateStock()}"];
+
+    // Database
+    Database [label="{Database (GORM)}"];
+
+    // Decoupled Relations
+    OrderController -> OrderService;
+    RestockController -> InventoryService;
+    StatsController -> StatsService;
+    InventoryController -> InventoryService;
+
+    // Service to Repository / cross-service
+    OrderService -> OrderRepository;
+    OrderService -> InventoryService [label="Delegate stock logic"];
+    InventoryService -> InventoryRepository;
+    StatsService -> OrderRepository [label="Delegate aggregations"];
+
+    // Repositories to Database
+    OrderRepository -> Database;
+    InventoryRepository -> Database;
+}
