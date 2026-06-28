@@ -1,8 +1,7 @@
 package controllers
 
 import (
-	"supplierhub-api/database"
-	"supplierhub-api/models"
+	"supplierhub-api/services"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -10,26 +9,12 @@ import (
 func GetInventory(c *fiber.Ctx) error {
 	jwtUserID := uint(c.Locals("user_id").(float64))
 
-	var inventories []models.Inventory
-	database.DB.Where("user_id = ?", jwtUserID).Find(&inventories)
+	invService := services.NewInventoryService()
+	result, err := invService.GetUserInventory(jwtUserID)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"detail": "Gagal mengambil data inventaris"})
+	}
 
-	var result []fiber.Map
-	for _, inv := range inventories {
-		var product models.Product
-		database.DB.First(&product, inv.ProductID)
-		result = append(result, fiber.Map{
-			"id":           inv.ID,
-			"product_id":   inv.ProductID,
-			"product_name": product.Name,
-			"sku":          product.SKU,
-			"unit":         product.Unit,
-			"quantity":     inv.Quantity,
-			"updated_at":   inv.UpdatedAt,
-		})
-	}
-	if result == nil {
-		result = make([]fiber.Map, 0)
-	}
 	return c.JSON(result)
 }
 
@@ -50,31 +35,17 @@ func TransferInventory(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"detail": "Invalid request"})
 	}
 
-	tx := database.DB.Begin()
-
-	var inv models.Inventory
-	if err := tx.Where("user_id = ? AND product_id = ?", jwtUserID, req.ProductID).First(&inv).Error; err != nil {
-		tx.Rollback()
-		return c.Status(404).JSON(fiber.Map{"detail": "Barang tidak ada di gudang"})
+	invService := services.NewInventoryService()
+	err := invService.TransferToCatalog(jwtUserID, req.ProductID, req.Quantity)
+	if err != nil {
+		if err.Error() == "Barang tidak ada di gudang" {
+			return c.Status(404).JSON(fiber.Map{"detail": err.Error()})
+		}
+		if err.Error() == "Produk katalog tidak ditemukan" {
+			return c.Status(404).JSON(fiber.Map{"detail": err.Error()})
+		}
+		return c.Status(400).JSON(fiber.Map{"detail": err.Error()})
 	}
-
-	if inv.Quantity < req.Quantity {
-		tx.Rollback()
-		return c.Status(400).JSON(fiber.Map{"detail": "Stok gudang tidak cukup"})
-	}
-
-	var product models.Product
-	if err := tx.First(&product, req.ProductID).Error; err != nil {
-		tx.Rollback()
-		return c.Status(404).JSON(fiber.Map{"detail": "Produk katalog tidak ditemukan"})
-	}
-
-	inv.Quantity -= req.Quantity
-	product.Stock += req.Quantity
-
-	tx.Save(&inv)
-	tx.Save(&product)
-	tx.Commit()
 
 	return c.JSON(fiber.Map{"message": "Berhasil transfer ke Katalog"})
 }

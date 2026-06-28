@@ -1,21 +1,18 @@
 package controllers
 
 import (
-	"fmt"
-	"time"
-
-	"supplierhub-api/database"
-	"supplierhub-api/models"
+	"supplierhub-api/repositories"
+	"supplierhub-api/services"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-type RestockRequest struct {
-	ProductID int32 `json:"product_id"`
-	Quantity  int   `json:"quantity"`
-}
-
 func RequestRestock(c *fiber.Ctx) error {
+	type RestockRequest struct {
+		ProductID int32 `json:"product_id"`
+		Quantity  int   `json:"quantity"`
+	}
+
 	jwtRole := c.Locals("role").(string)
 	if jwtRole != "admin" {
 		return c.Status(403).JSON(fiber.Map{"detail": "Hanya admin yang dapat meminta restock"})
@@ -27,23 +24,14 @@ func RequestRestock(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"detail": "Invalid request"})
 	}
 
-	var dist models.User
-	if err := database.DB.Where("role = ?", "distributor").First(&dist).Error; err != nil {
-		return c.Status(500).JSON(fiber.Map{"detail": "Distributor belum tersedia"})
+	restockService := services.NewRestockService()
+	if err := restockService.RequestRestock(jwtUserID, req.ProductID, req.Quantity); err != nil {
+		if err.Error() == "Distributor belum tersedia" {
+			return c.Status(500).JSON(fiber.Map{"detail": err.Error()})
+		}
+		return c.Status(500).JSON(fiber.Map{"detail": "Gagal membuat permintaan"})
 	}
 
-	invoiceID := fmt.Sprintf("REQ-%d", time.Now().Unix())
-
-	restock := models.RestockOrder{
-		InvoiceID:     invoiceID,
-		AdminID:       jwtUserID,
-		DistributorID: dist.ID,
-		ProductID:     req.ProductID,
-		Quantity:      req.Quantity,
-		Status:        "Menunggu Persetujuan",
-	}
-
-	database.DB.Create(&restock)
 	return c.JSON(fiber.Map{"message": "Permintaan restock berhasil dikirim"})
 }
 
@@ -51,26 +39,19 @@ func GetRestocks(c *fiber.Ctx) error {
 	jwtRole := c.Locals("role").(string)
 	jwtUserID := int32(c.Locals("user_id").(float64))
 
-	var restocks []models.RestockOrder
-	query := database.DB.Model(&models.RestockOrder{})
-
-	switch jwtRole {
-	case "distributor":
-		query = query.Where("distributor_id = ?", jwtUserID)
-	case "admin":
-		query = query.Where("admin_id = ?", jwtUserID)
-	default:
+	if jwtRole != "distributor" && jwtRole != "admin" {
 		return c.Status(403).JSON(fiber.Map{"detail": "Akses dilarang"})
 	}
-	query.Find(&restocks)
+
+	repo := repositories.NewRestockRepository()
+	restocks, err := repo.FindByRole(jwtRole, jwtUserID)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"detail": "Gagal mengambil data restock"})
+	}
 
 	var result []fiber.Map
 	for _, r := range restocks {
-		var product models.Product
-		database.DB.First(&product, r.ProductID)
-
-		var admin models.User
-		database.DB.First(&admin, r.AdminID)
+		product, admin, _ := repo.GetRelatedData(r.ProductID, r.AdminID)
 
 		result = append(result, fiber.Map{
 			"id":           r.ID,
@@ -96,46 +77,18 @@ func ApproveRestock(c *fiber.Ctx) error {
 	distributorID := uint(c.Locals("user_id").(float64))
 
 	id := c.Params("id")
-	var restock models.RestockOrder
-	if err := database.DB.First(&restock, id).Error; err != nil {
-		return c.Status(404).JSON(fiber.Map{"detail": "Permintaan tidak ditemukan"})
-	}
-
-	if restock.Status == "Disetujui & Dikirim" {
-		return c.Status(400).JSON(fiber.Map{"detail": "Sudah disetujui sebelumnya"})
-	}
-
-	tx := database.DB.Begin()
-
-	var distInv models.Inventory
-	if err := tx.Where("user_id = ? AND product_id = ?", distributorID, restock.ProductID).First(&distInv).Error; err != nil || distInv.Quantity < restock.Quantity {
-		tx.Rollback()
-		return c.Status(400).JSON(fiber.Map{"detail": "Stok gudang pabrik tidak mencukupi"})
-	}
-
-	distInv.Quantity -= restock.Quantity
-	tx.Save(&distInv)
-
-	var adminInv models.Inventory
-	err := tx.Where("user_id = ? AND product_id = ?", restock.AdminID, restock.ProductID).First(&adminInv).Error
+	
+	restockService := services.NewRestockService()
+	err := restockService.ApproveRestock(distributorID, id)
 	if err != nil {
-		adminInv = models.Inventory{
-			UserID:    uint(restock.AdminID),
-			ProductID: uint(restock.ProductID),
-			Quantity:  restock.Quantity,
+		if err.Error() == "Permintaan tidak ditemukan" {
+			return c.Status(404).JSON(fiber.Map{"detail": err.Error()})
 		}
-		tx.Create(&adminInv)
-	} else {
-		adminInv.Quantity += restock.Quantity
-		tx.Save(&adminInv)
+		if err.Error() == "Sudah disetujui sebelumnya" || err.Error() == "Stok gudang pabrik tidak mencukupi" {
+			return c.Status(400).JSON(fiber.Map{"detail": err.Error()})
+		}
+		return c.Status(500).JSON(fiber.Map{"detail": err.Error()})
 	}
 
-	restock.Status = "Disetujui & Dikirim"
-	if err := tx.Save(&restock).Error; err != nil {
-		tx.Rollback()
-		return c.Status(500).JSON(fiber.Map{"detail": "Gagal update status"})
-	}
-
-	tx.Commit()
 	return c.JSON(fiber.Map{"message": "Berhasil menyetujui restock, barang dipindah ke Gudang Supplier Hub"})
 }
