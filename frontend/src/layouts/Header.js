@@ -46,8 +46,8 @@ export const Header = (activeTab, user, cart) => {
             <span class="absolute top-2.5 right-3 w-2 h-2 bg-red-500 rounded-full border-2 border-slate-900"></span>
           </button>
 
-          <!-- Cart Icon (Hanya untuk UMKM & Admin) -->
-          ${(user && (user.role === 'umkm' || user.role === 'admin')) ? `
+          <!-- Cart Icon (Hanya untuk UMKM) -->
+          ${(user && user.role === 'umkm') ? `
             <button onclick="window.toggleCart && window.toggleCart()" class="relative w-11 h-11 flex items-center justify-center bg-white/5 border border-white/10 rounded-2xl text-slate-300 hover:text-indigo-400 hover:border-indigo-500/30 hover:bg-indigo-500/10 transition-all shadow-sm group">
               <i class="fas fa-shopping-cart group-hover:scale-110 transition-transform"></i>
               ${cartItemCount > 0 ? `
