@@ -59,12 +59,12 @@ func ConnectDB() {
 		DB.Create(&umkm1)
 		DB.Create(&distributor)
 
-		// Seed Products (Stock awal Etalase = 0)
+		// Seed Products (Stock awal Etalase = 100)
 		products := []models.Product{
-			{Name: "Beras Premium 5Kg", Category: "Sembako", SKU: "BRS-PRM-001", Description: "Beras pulen kualitas super", Unit: "sak", Price: 65000, Stock: 0},
-			{Name: "Minyak Goreng 2L", Category: "Sembako", SKU: "MNY-GRG-002", Description: "Minyak sawit murni 2 Liter", Unit: "pouch", Price: 35000, Stock: 0},
-			{Name: "Gula Pasir 1Kg", Category: "Sembako", SKU: "GLA-PSR-003", Description: "Gula pasir putih lokal", Unit: "kg", Price: 15000, Stock: 0},
-			{Name: "Tepung Terigu 1Kg", Category: "Sembako", SKU: "TPG-TRG-004", Description: "Tepung protein sedang", Unit: "kg", Price: 12000, Stock: 0},
+			{Name: "Beras Premium 5Kg", Category: "Sembako", SKU: "BRS-PRM-001", Description: "Beras pulen kualitas super", Unit: "sak", Price: 65000, Stock: 100},
+			{Name: "Minyak Goreng 2L", Category: "Sembako", SKU: "MNY-GRG-002", Description: "Minyak sawit murni 2 Liter", Unit: "pouch", Price: 35000, Stock: 100},
+			{Name: "Gula Pasir 1Kg", Category: "Sembako", SKU: "GLA-PSR-003", Description: "Gula pasir putih lokal", Unit: "kg", Price: 15000, Stock: 100},
+			{Name: "Tepung Terigu 1Kg", Category: "Sembako", SKU: "TPG-TRG-004", Description: "Tepung protein sedang", Unit: "kg", Price: 12000, Stock: 100},
 		}
 		for _, p := range products {
 			DB.Create(&p)

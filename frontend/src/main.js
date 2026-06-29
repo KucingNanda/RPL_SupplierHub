@@ -9,6 +9,7 @@ import { OrderHistoryPage } from './pages/OrderHistory.js'
 import { DistributorDashboardPage } from './pages/DistributorDashboard.js'
 import { TrackingCenterPage } from './pages/TrackingCenter.js'
 import { InventoryPage } from './pages/Inventory.js'
+import { CartModal } from './components/CartModal.js'
 
 import { state, setState } from './store/state.js'
 import { api } from './services/api.js'
@@ -63,6 +64,9 @@ const renderApp = () => {
           </main>
         </div>
       </div>
+      
+      <!-- Render Cart Modal if open -->
+      ${CartModal(state.isCartOpen, state.cart)}
     </div>
   `;
 }
@@ -298,7 +302,7 @@ window.searchTracking = () => {
 const renderLogin = () => `
 <div class="min-h-screen flex bg-slate-900">
   <!-- Left Panel: Branding (Hidden on Mobile) -->
-  <div class="hidden lg:flex lg:w-3/5 relative items-center justify-center overflow-hidden bg-slate-900 border-r border-white/10">
+  <div class="hidden lg:flex lg:w-1/2 relative items-center justify-center overflow-hidden bg-slate-900 border-r border-white/10">
     <!-- Mesh Gradient Background -->
     <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_var(--tw-gradient-stops))] from-indigo-900/80 via-slate-900 to-blue-900/60"></div>
     <div class="absolute top-[10%] left-[20%] w-[30vw] h-[30vw] bg-indigo-500/20 blur-[100px] rounded-full mix-blend-screen animate-pulse-slow"></div>
@@ -331,11 +335,11 @@ const renderLogin = () => `
   </div>
 
   <!-- Right Panel: Login Form -->
-  <div class="w-full lg:w-2/5 flex items-center justify-center relative overflow-hidden bg-slate-900 lg:bg-transparent">
+  <div class="w-full lg:w-1/2 flex items-center justify-center relative overflow-hidden bg-slate-900 lg:bg-transparent">
     <!-- Background for Mobile Only -->
     <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/40 via-slate-900 to-indigo-900/40 pointer-events-none z-0 lg:hidden"></div>
     
-    <div class="relative z-10 w-full max-w-md px-8 sm:px-12 py-12">
+    <div class="relative z-10 w-full max-w-lg px-8 sm:px-16 py-12">
       <!-- Mobile Logo -->
       <div class="lg:hidden text-center mb-10 animate-fade-in">
         <div class="mx-auto w-16 h-16 bg-gradient-to-tr from-indigo-500 to-blue-500 rounded-[1.2rem] flex items-center justify-center shadow-lg shadow-indigo-500/30 mb-4">
@@ -345,8 +349,8 @@ const renderLogin = () => `
       </div>
 
       <div class="text-left mb-10 animate-fade-in">
-        <h2 class="text-3xl font-black text-white tracking-tight">Selamat Datang</h2>
-        <p class="text-sm text-indigo-200/60 mt-2 font-medium">Masuk ke akun Anda untuk melanjutkan.</p>
+        <h2 class="text-4xl font-black text-white tracking-tight">Selamat Datang</h2>
+        <p class="text-sm text-indigo-200/60 mt-3 font-medium">Masuk ke akun Anda untuk melanjutkan ke dashboard.</p>
       </div>
 
       <div class="space-y-6 animate-fade-in" style="animation-delay: 0.1s;">
