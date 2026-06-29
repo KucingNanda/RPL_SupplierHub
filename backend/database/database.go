@@ -44,21 +44,30 @@ func ConnectDB() {
 		log.Fatal("Gagal migrasi database: ", err)
 	}
 
-	// === AUTO SEEDER ===
+	// === AUTO SEEDER USERS ===
 	var count int64
 	DB.Model(&models.User{}).Count(&count)
+	var distributor models.User
 	if count == 0 {
-		log.Println("Database kosong. Menjalankan auto-seeder...")
+		log.Println("Tabel Users kosong. Menjalankan seeder user...")
 		
-		// Seed Users
 		admin := models.User{Name: "Admin Pusat", Username: "admin", Password: "admin123", Role: "admin", Phone: "081122334455", Address: "Gudang Pusat SupplierHub", City: "Jakarta"}
 		umkm1 := models.User{Name: "Toko Sinar Jaya", Username: "umkm1", Password: "user123", Role: "umkm", Phone: "089988776655", Address: "Jl. Merdeka No. 45", City: "Bandung"}
-		distributor := models.User{Name: "Pabrik Utama Indofood", Username: "distributor", Password: "distributor123", Role: "distributor", Phone: "0219988776", Address: "Kawasan Industri", City: "Cikarang"}
+		distributor = models.User{Name: "Pabrik Utama Indofood", Username: "distributor", Password: "distributor123", Role: "distributor", Phone: "0219988776", Address: "Kawasan Industri", City: "Cikarang"}
 		
 		DB.Create(&admin)
 		DB.Create(&umkm1)
 		DB.Create(&distributor)
+	} else {
+		DB.Where("role = ?", "distributor").First(&distributor)
+	}
 
+	// === AUTO SEEDER PRODUCTS ===
+	var productCount int64
+	DB.Model(&models.Product{}).Count(&productCount)
+	if productCount == 0 {
+		log.Println("Tabel Produk kosong. Menjalankan seeder produk dan inventory...")
+		
 		// Seed Products (Stock awal Etalase = 100)
 		products := []models.Product{
 			{Name: "Beras Premium 5Kg", Category: "Sembako", SKU: "BRS-PRM-001", Description: "Beras pulen kualitas super", Unit: "sak", Price: 65000, Stock: 100},
@@ -71,11 +80,13 @@ func ConnectDB() {
 		}
 
 		// Modal Awal: Pabrik / Distributor punya 1000 pcs per produk di Gudangnya
-		for i := 1; i <= 4; i++ {
-			DB.Create(&models.Inventory{UserID: uint(distributor.ID), ProductID: uint(i), Quantity: 1000})
+		if distributor.ID != 0 {
+			for i := 1; i <= 4; i++ {
+				DB.Create(&models.Inventory{UserID: uint(distributor.ID), ProductID: uint(i), Quantity: 1000})
+			}
 		}
 
-		log.Println("Seeder selesai. (Produk di katalog = 0, Gudang Distributor = 1000pcs)")
+		log.Println("Seeder Produk selesai. (Produk di katalog = 100, Gudang Distributor = 1000pcs)")
 	}
 
 	log.Println("Koneksi Database MySQL (Online) & Migrasi Berhasil")
