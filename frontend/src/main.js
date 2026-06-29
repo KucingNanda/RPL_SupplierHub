@@ -136,7 +136,13 @@ window.addToCart = (productId) => {
       window.showToast("Stok tidak mencukupi!", "error");
     }
   } else {
-    state.cart.push({ product_id: productId, quantity: 1 });
+    state.cart.push({ 
+      product_id: productId, 
+      quantity: 1,
+      name: product.name,
+      price: product.price,
+      unit: product.unit
+    });
     window.showToast(`${product.name} dimasukkan ke keranjang`);
   }
   renderApp();
