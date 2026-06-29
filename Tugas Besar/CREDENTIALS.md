@@ -16,7 +16,14 @@ Gunakan akun ini untuk mensimulasikan proses pembeli: melihat katalog, menambah 
 - **Nama Pengguna (Username):** `umkm1`
 - **Kata Sandi (Password):** `user123`
 
+## 3. Akun Pabrik / Distributor (Distributor Utama)
+Gunakan akun ini untuk menyetujui permintaan *Purchase Order* (PO) dari Gudang SupplierHub (Admin) dan mengirimkan stok baru.
+
+- **Peran:** Distributor
+- **Nama Pengguna (Username):** `distributor`
+- **Kata Sandi (Password):** `distributor123`
+
 ---
 
 > **Tips:** 
-> Jika Anda sewaktu-waktu membutuhkan lebih banyak akun UMKM, Anda harus mendaftarkannya langsung ke database secara manual atau menambahkannya ke fungsi `Auto-Seeder` di file `backend/database/database.go`.
+> Jika Anda sewaktu-waktu membutuhkan lebih banyak akun pengguna, Anda harus mendaftarkannya langsung ke database secara manual atau menambahkannya ke fungsi `Auto-Seeder` di file `backend/database/database.go`.
