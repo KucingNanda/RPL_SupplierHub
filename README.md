@@ -26,12 +26,16 @@ Frontend akan berjalan dan menampilkan link lokal (biasanya di `http://localhost
 
 ---
 
-## 🗄️ Database
+## 🗄️ Konfigurasi Database (MySQL)
 
-Aplikasi ini menggunakan **MySQL**. Konfigurasi koneksi database diatur di dalam file `backend/.env`.
-Saat aplikasi pertama kali dijalankan (`go run main.go`), fitur **GORM AutoMigrate** akan secara otomatis membuat tabel-tabel yang dibutuhkan. 
+Aplikasi ini menggunakan **MySQL**. Anda tidak perlu melakukan konfigurasi yang rumit!
 
-Aplikasi ini juga dilengkapi dengan **Auto Seeder**. Jika database kosong, sistem akan secara otomatis mengisi data awal (produk, inventaris, dan pengguna).
+1. Pastikan server MySQL (misalnya XAMPP atau Docker) sedang menyala di laptop Anda.
+2. Buat sebuah database kosong bernama `supplier_hub`.
+3. Jalankan *backend* dengan `go run main.go`. Fitur **GORM AutoMigrate** akan secara otomatis membuat tabel-tabel yang dibutuhkan. 
+4. Aplikasi dilengkapi dengan **Auto Seeder**. Karena database Anda masih kosong, sistem akan secara otomatis menyuntikkan (mengisi) data awal seperti produk, inventaris, dan kredensial pengguna, sehingga aplikasi bisa langsung diuji coba.
+
+> **Catatan Konfigurasi:** Sistem akan mencoba terhubung menggunakan kredensial bawaan XAMPP (`root`, tanpa password, host `127.0.0.1:3306`). Jika Anda menggunakan *password* untuk MySQL Anda, silakan ubah nama file `backend/.env.example` menjadi `backend/.env` dan sesuaikan nilainya.
 
 ---
 
