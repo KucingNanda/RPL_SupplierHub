@@ -1,0 +1,25 @@
+basePath: /api
+host: localhost:8080
+info:
+  contact: {}
+  description: REST API for SupplierHub Supply Chain Management System.
+  title: SupplierHub B2B API
+  version: "1.0"
+paths:
+  /products:
+    get:
+      consumes:
+      - application/json
+      description: Mengambil semua data produk dari katalog
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Dapatkan daftar produk
+      tags:
+      - products
+swagger: "2.0"

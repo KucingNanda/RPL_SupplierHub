@@ -5,9 +5,12 @@ import (
 	"supplierhub-api/middleware"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/swagger"
+	_ "supplierhub-api/docs"
 )
 
 func SetupRoutes(app *fiber.App) {
+	app.Get("/swagger/*", swagger.HandlerDefault)
 	api := app.Group("/api")
 
 	// Auth

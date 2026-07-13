@@ -10,6 +10,11 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
+// @title SupplierHub B2B API
+// @version 1.0
+// @description REST API for SupplierHub Supply Chain Management System.
+// @host localhost:8080
+// @BasePath /api
 func main() {
 	// Koneksi ke Database
 	database.ConnectDB()

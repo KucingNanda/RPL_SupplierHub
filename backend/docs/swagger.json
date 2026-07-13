@@ -1,0 +1,37 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "REST API for SupplierHub Supply Chain Management System.",
+        "title": "SupplierHub B2B API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api",
+    "paths": {
+        "/products": {
+            "get": {
+                "description": "Mengambil semua data produk dari katalog",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "products"
+                ],
+                "summary": "Dapatkan daftar produk",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

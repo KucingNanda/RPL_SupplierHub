@@ -7,6 +7,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// GetProducts godoc
+// @Summary Dapatkan daftar produk
+// @Description Mengambil semua data produk dari katalog
+// @Tags products
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /products [get]
 func GetProducts(c *fiber.Ctx) error {
 	var products []models.Product
 	database.DB.Find(&products)

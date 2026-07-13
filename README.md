@@ -15,6 +15,10 @@ go run main.go
 ```
 Backend akan berjalan di port `8080`.
 
+**Dokumentasi API (Swagger):**
+Aplikasi ini sudah dilengkapi dengan dokumentasi interaktif Swagger. Saat backend berjalan, Anda dapat mengakses dokumentasinya dengan membuka browser dan mengunjungi:
+👉 `http://localhost:8080/swagger/index.html`
+
 ### 2. Menjalankan Frontend (Web)
 Buka terminal baru lainnya, arahkan ke folder `frontend`, lalu jalankan:
 ```bash
